@@ -36,7 +36,7 @@ upload:
     repository: codeberg.org/sparrow/upload
     tag: "v1.1.1"
     pullPolicy: IfNotPresent
-  # File TTL — empty string disables expiry.
+  # File TTL — empty string falls back to the upload service default (24h).
   ttl: ""
   # Max upload size in bytes (default 2 GiB).
   maxUploadBytes: ""

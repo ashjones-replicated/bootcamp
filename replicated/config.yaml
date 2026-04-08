@@ -45,7 +45,7 @@ spec:
           default: ""
           help_text: >-
             How long uploaded files are retained before automatic deletion
-            (e.g. 24h, 7d). Leave empty to keep files indefinitely.
+            (e.g. 24h, 7d). Leave empty to use the upload service default (24h).
           required: false
 
         - name: upload_max_bytes

@@ -13,10 +13,17 @@ spec:
       storage:
         size: repl{{ ConfigOption "postgres_storage_size" }}
     upload:
-      ttl: repl{{ ConfigOption "upload_ttl" }}
-      maxUploadBytes: repl{{ ConfigOption "upload_max_bytes" }}
       storage:
         size: repl{{ ConfigOption "upload_storage_size" }}
+  optionalValues:
+    - when: 'repl{{ ConfigOptionNotEquals "upload_ttl" "" }}'
+      values:
+        upload:
+          ttl: repl{{ ConfigOption "upload_ttl" }}
+    - when: 'repl{{ ConfigOptionNotEquals "upload_max_bytes" "" }}'
+      values:
+        upload:
+          maxUploadBytes: repl{{ ConfigOption "upload_max_bytes" }}
   builder:
     image:
       repository: bootcamp/web
