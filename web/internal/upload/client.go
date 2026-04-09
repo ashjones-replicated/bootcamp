@@ -101,8 +101,14 @@ func (c *Client) UploadFile(ctx context.Context, token string, r *http.Request) 
 }
 
 // ListFiles returns the files visible to the given token.
-func (c *Client) ListFiles(ctx context.Context, token string) ([]FileInfo, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseURL+"/files?json", nil)
+// When all is true the request includes ?all, causing the upload service to
+// return every user's files (only effective when the token belongs to an admin).
+func (c *Client) ListFiles(ctx context.Context, token string, all bool) ([]FileInfo, error) {
+	endpoint := c.baseURL + "/files?json"
+	if all {
+		endpoint += "&all"
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
 		return nil, err
 	}

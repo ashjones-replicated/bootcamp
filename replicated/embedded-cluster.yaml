@@ -3,6 +3,4 @@ kind: Config
 metadata:
   name: bootcamp
 spec:
-  # Run 'replicated embedded-cluster versions' to find the latest version
-  # Replace with actual version
-  version: "2.x.x+k8s-1.30"
+  version: "2.15.0+k8s-1.34"

@@ -27,7 +27,7 @@ func (a *App) handleUpload(w http.ResponseWriter, r *http.Request) {
 
 func (a *App) handleListFiles(w http.ResponseWriter, r *http.Request) {
 	user := userFromContext(r)
-	files, err := a.Upload.ListFiles(r.Context(), user.UploadToken)
+	files, err := a.Upload.ListFiles(r.Context(), user.UploadToken, user.IsAdmin)
 	if err != nil {
 		a.Log.Error("list files", "err", err)
 		http.Error(w, "failed to list files", http.StatusBadGateway)
