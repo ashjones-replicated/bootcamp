@@ -198,12 +198,7 @@ if (createUserForm) {
 
     fetch('/api/admin/entitlements')
         .then(r => r.json())
-        .then(e => {
-            if (!e.allow_user_creation) {
-                addBtn.disabled = true;
-                addBtn.title = 'User creation is disabled by your license.';
-            }
-        })
+        .then(e => { if (e.allow_user_creation) addBtn.hidden = false; })
         .catch(() => {});
 
     function openModal()  { overlay.hidden = false; document.getElementById('new-username').focus(); }
