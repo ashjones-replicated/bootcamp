@@ -21,8 +21,9 @@ type licenseField struct {
 }
 
 // licenseInfo mirrors the response from GET /api/v1/license/info.
+// Expiry lives in entitlements["expires_at"].Value, not as a top-level field.
 type licenseInfo struct {
-	ExpiresAt string `json:"expiresAt"`
+	Entitlements map[string]licenseField `json:"entitlements"`
 }
 
 // LicenseClient reads license information from the Replicated
@@ -117,12 +118,17 @@ func (c *LicenseClient) IsExpired(ctx context.Context) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	if info.ExpiresAt == "" {
+	f, ok := info.Entitlements["expires_at"]
+	if !ok {
 		return false, nil
 	}
-	t, err := time.Parse(time.RFC3339, info.ExpiresAt)
+	v, _ := f.Value.(string)
+	if v == "" {
+		return false, nil
+	}
+	t, err := time.Parse(time.RFC3339, v)
 	if err != nil {
-		return false, fmt.Errorf("parse expiresAt: %w", err)
+		return false, fmt.Errorf("parse expires_at: %w", err)
 	}
 	return time.Now().After(t), nil
 }
