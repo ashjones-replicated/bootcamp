@@ -22,6 +22,9 @@ config:
 # Sensitive values — override via --set or a separate values file; never commit real values.
 secrets:
   uploadAdminToken: ""
+  # Preset password for the admin user. If empty, a random password is generated
+  # on first start and printed to the pod logs.
+  adminPassword: ""
   # PostgreSQL connection URL. Required when postgres.internal is false.
   databaseURL: ""
 
@@ -99,28 +102,3 @@ replicated:
   statusInformers:
     - deployment/bootcamp
     - deployment/bootcamp-upload
-
-# Values passed to the cloudnative-pg operator subchart.
-# See https://cloudnative-pg.github.io/charts for available options.
-cloudnative-pg: {}
-
-# Values passed to the Traefik ingress controller subchart.
-# See https://github.com/traefik/traefik-helm-chart for all options.
-traefik:
-  ingressClass:
-    enabled: true
-    isDefaultClass: true
-  # ports.web.redirectTo is intentionally absent from defaults — it redirects ALL
-  # HTTP traffic to HTTPS cluster-wide. Enable it only when ingress.tls is true.
-  certificatesResolvers:
-    letsencrypt:
-      acme:
-        # Required: set to a valid email address for Let's Encrypt notifications.
-        email: ""
-        storage: /data/acme.json
-        httpChallenge:
-          entryPoint: web
-  persistence:
-    enabled: true
-    size: 128Mi
-    path: /data

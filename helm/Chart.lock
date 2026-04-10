@@ -1,12 +1,6 @@
 dependencies:
-- name: cloudnative-pg
-  repository: https://cloudnative-pg.github.io/charts
-  version: 0.22.0
-- name: traefik
-  repository: https://helm.traefik.io/traefik
-  version: 33.0.0
 - name: replicated
   repository: oci://registry.replicated.com/library
   version: 1.19.1
-digest: sha256:798d22d1adfacb3f525f557d21e69d139022a0ce4180bd2ebb6c12dbefadd000
-generated: "2026-04-09T15:24:52.844987+01:00"
+digest: sha256:8bce13b124b777dde2727242b796450a679ef3d9bebce798e822307a19b305d2
+generated: "2026-04-10T08:49:24.56666563Z"

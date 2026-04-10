@@ -10,10 +10,16 @@ spec:
         - name: upload_admin_token
           type: password
           title: Upload Service Admin Token
+          hidden: true
+          default: repl{{ RandomString 64 }}
+
+        - name: admin_password
+          type: password
+          title: Admin Password
           help_text: >-
-            The preset admin token for the upload service. Must match the token
-            configured in the upload service deployment.
-          required: true
+            Password for the built-in admin account. Auto-generated if left empty,
+            but the generated password will only appear in pod logs on first start.
+          default: repl{{ RandomString 32 }}
 
     - name: database
       title: Database

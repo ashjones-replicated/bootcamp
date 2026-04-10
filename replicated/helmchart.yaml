@@ -6,9 +6,11 @@ spec:
   chart:
     name: bootcamp
     chartVersion: 0.1.0
+  weight: 2
   values:
     secrets:
       uploadAdminToken: repl{{ ConfigOption "upload_admin_token" }}
+      adminPassword: repl{{ ConfigOption "admin_password" }}
     postgres:
       internal: repl{{ ConfigOptionEquals "postgres_type" "internal" }}
       storage:
@@ -20,18 +22,6 @@ spec:
       host: repl{{ ConfigOption "hostname" }}
       tls: repl{{ ConfigOptionEquals "tls_enabled" "1" }}
   optionalValues:
-    - when: 'repl{{ ConfigOptionEquals "tls_enabled" "1" }}'
-      recursiveMerge: true
-      values:
-        traefik:
-          ports:
-            web:
-              redirectTo:
-                port: websecure
-          certificatesResolvers:
-            letsencrypt:
-              acme:
-                email: repl{{ ConfigOption "acme_email" }}
     - when: 'repl{{ ConfigOptionEquals "postgres_type" "external" }}'
       recursiveMerge: true
       values:
@@ -55,7 +45,5 @@ spec:
       image:
         repository: codeberg.org/sparrow/upload
         tag: "v2.0.0"
-    postgres:
-      instances: 1
     replicated:
       replicaCount: 1

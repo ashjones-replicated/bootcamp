@@ -14,6 +14,7 @@ type Config struct {
 	DatabaseURL      string
 	UploadServiceURL string
 	UploadAdminToken string
+	AdminPassword    string
 	CookieSecure     bool
 	SessionDuration  time.Duration
 	ReplicatedSDKURL string
@@ -25,6 +26,7 @@ func Load() (*Config, error) {
 		DatabaseURL:      os.Getenv("DATABASE_URL"),
 		UploadServiceURL: strings.TrimRight(os.Getenv("UPLOAD_SERVICE_URL"), "/"),
 		UploadAdminToken: base64.StdEncoding.EncodeToString([]byte("admin:" + os.Getenv("UPLOAD_ADMIN_TOKEN"))),
+		AdminPassword:    os.Getenv("ADMIN_PASSWORD"),
 		CookieSecure:     getenvBool("COOKIE_SECURE", true),
 		SessionDuration:  24 * time.Hour,
 		ReplicatedSDKURL: getenv("REPLICATED_SDK_URL", "http://replicated:3000"),

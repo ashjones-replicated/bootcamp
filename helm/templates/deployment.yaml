@@ -13,6 +13,8 @@ spec:
     metadata:
       labels:
         {{- include "bootcamp.selectorLabels" . | nindent 8 }}
+      annotations:
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
     spec:
       {{- if .Values.postgres.internal }}
       initContainers:
@@ -68,6 +70,13 @@ spec:
                 secretKeyRef:
                   name: {{ include "bootcamp.fullname" . }}
                   key: UPLOAD_ADMIN_TOKEN
+            {{- if .Values.secrets.adminPassword }}
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "bootcamp.fullname" . }}
+                  key: ADMIN_PASSWORD
+            {{- end }}
             - name: REPLICATED_SDK_URL
               valueFrom:
                 configMapKeyRef:

@@ -80,6 +80,10 @@
           "type": "string",
           "description": "Preset admin token for the upload service."
         },
+        "adminPassword": {
+          "type": "string",
+          "description": "Preset password for the web UI admin user. Randomly generated on first start when empty."
+        },
         "databaseURL": {
           "type": "string",
           "description": "PostgreSQL connection URL (e.g. postgres://user:pass@host:5432/db). Required when postgres.internal is false."
@@ -204,17 +208,13 @@
         }
       }
     },
+    "global": {
+      "type": "object",
+      "description": "Global values injected by Replicated at install time (e.g. global.replicated)."
+    },
     "replicated": {
       "type": "object",
       "description": "Values passed through to the Replicated SDK subchart."
-    },
-    "cloudnative-pg": {
-      "type": "object",
-      "description": "Values passed through to the cloudnative-pg operator subchart."
-    },
-    "traefik": {
-      "type": "object",
-      "description": "Values passed through to the Traefik ingress controller subchart."
     }
   },
   "if": {
