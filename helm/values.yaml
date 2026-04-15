@@ -101,3 +101,11 @@ replicated:
   statusInformers:
     - deployment/bootcamp
     - deployment/bootcamp-upload
+
+# Global values. Replicated injects global.replicated.* at install time.
+# Set proxy.registryDomain to route all images through the Replicated proxy.
+# Leave empty for direct registry access (local development).
+global:
+  replicated:
+    proxy:
+      registryDomain: ""

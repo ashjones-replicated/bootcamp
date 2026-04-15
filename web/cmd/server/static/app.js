@@ -198,7 +198,13 @@ if (createUserForm) {
 
     fetch('/api/admin/entitlements')
         .then(r => r.json())
-        .then(e => { if (e.allow_user_creation) addBtn.style.removeProperty('display'); })
+        .then(e => {
+            if (e.allow_user_creation) addBtn.style.removeProperty('display');
+            if (e.sdk_available) {
+                const card = document.getElementById('support-card');
+                if (card) card.style.removeProperty('display');
+            }
+        })
         .catch(() => {});
 
     function openModal()  { overlay.hidden = false; document.getElementById('new-username').focus(); }
@@ -311,6 +317,31 @@ async function deleteUser(id, username) {
     } catch (e) {
         alert('Error: ' + e.message);
     }
+}
+
+/* ── Support bundle ─────────────────────────────────── */
+
+const generateBundleBtn = document.getElementById('generate-bundle-btn');
+if (generateBundleBtn) {
+    generateBundleBtn.addEventListener('click', async () => {
+        const status = document.getElementById('bundle-status');
+        generateBundleBtn.disabled = true;
+        status.textContent = 'Generating support bundle\u2026 this may take a minute.';
+        status.className = 'status-msg';
+
+        try {
+            const resp = await fetch('/api/admin/supportbundle', { method: 'POST' });
+            if (!resp.ok) throw new Error(await resp.text());
+            const result = await resp.json();
+            status.textContent = 'Bundle uploaded. ID: ' + result.bundleId;
+            status.className = 'status-msg ok';
+        } catch (err) {
+            status.textContent = 'Error: ' + err.message;
+            status.className = 'status-msg err';
+        } finally {
+            generateBundleBtn.disabled = false;
+        }
+    });
 }
 
 async function deleteFile(name, reload) {

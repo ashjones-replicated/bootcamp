@@ -8,4 +8,6 @@ data:
   BIND_ADDRESS: {{ .Values.config.bindAddress | quote }}
   UPLOAD_SERVICE_URL: {{ .Values.config.uploadServiceURL | default (printf "http://%s:8080" (include "bootcamp.uploadName" .)) | quote }}
   COOKIE_SECURE: {{ .Values.config.cookieSecure | quote }}
-  REPLICATED_SDK_URL: {{ .Values.config.replicatedSDKURL | default "http://replicated:3000" | quote }}
+  {{- if .Values.config.replicatedSDKURL }}
+  REPLICATED_SDK_URL: {{ .Values.config.replicatedSDKURL | quote }}
+  {{- end }}

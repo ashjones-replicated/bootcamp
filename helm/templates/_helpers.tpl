@@ -59,3 +59,19 @@ Upload service selector labels
 app.kubernetes.io/name: {{ include "bootcamp.name" . }}-upload
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{/*
+Return an image reference, optionally routed through the Replicated proxy.
+Args: dict "root" $ "image" "registry/repo:tag"
+When global.replicated.proxy.registryDomain is set, prefixes the image with
+  <domain>/proxy/bootcamp/
+Otherwise returns the image reference unchanged.
+*/}}
+{{- define "bootcamp.proxyImage" -}}
+{{- $domain := .root.Values.global.replicated.proxy.registryDomain -}}
+{{- if $domain -}}
+{{- printf "%s/proxy/bootcamp/%s" $domain .image -}}
+{{- else -}}
+{{- .image -}}
+{{- end -}}
+{{- end }}

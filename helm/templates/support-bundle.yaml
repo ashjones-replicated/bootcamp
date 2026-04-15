@@ -38,7 +38,103 @@ stringData:
             limits:
               maxAge: 168h
         {{ end }}
+        - http:
+            collectorName: app-health
+            get:
+              url: http://{{ include "bootcamp.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local/healthz
       analyzers:
+        - textAnalyze:
+            checkName: Application Health
+            fileName: http/app-health/result.json
+            regex: '"status":200'
+            outcomes:
+              - pass:
+                  when: "true"
+                  message: Application is healthy and returning HTTP 200.
+              - fail:
+                  when: "false"
+                  message: >-
+                    Application health check failed. The /healthz endpoint did not return HTTP 200.
+                    The application may be down or unable to reach the database. Check the bootcamp
+                    pod logs for details.
+        - deploymentStatus:
+            name: {{ include "bootcamp.fullname" . }}
+            namespace: {{ .Release.Namespace }}
+            outcomes:
+              - fail:
+                  when: "< 1"
+                  message: >-
+                    The bootcamp deployment has no available replicas. Users cannot access the
+                    application. Check pod logs and events in the {{ .Release.Namespace }} namespace.
+              - pass:
+                  when: ">= 1"
+                  message: The bootcamp deployment is running.
+        - deploymentStatus:
+            name: {{ include "bootcamp.uploadName" . }}
+            namespace: {{ .Release.Namespace }}
+            outcomes:
+              - fail:
+                  when: "< 1"
+                  message: >-
+                    The upload service deployment has no available replicas. File uploads and
+                    downloads will fail. Check pod logs and events in the {{ .Release.Namespace }} namespace.
+              - pass:
+                  when: ">= 1"
+                  message: The upload service deployment is running.
+        {{ if .Values.postgres.internal }}
+        - statefulsetStatus:
+            name: {{ include "bootcamp.pgClusterName" . }}
+            namespace: {{ .Release.Namespace }}
+            outcomes:
+              - fail:
+                  when: "< 1"
+                  message: >-
+                    The PostgreSQL cluster has no ready instances. The application will be unable
+                    to read or write data. Check CNPG cluster events and pod logs in the
+                    {{ .Release.Namespace }} namespace.
+              - pass:
+                  when: ">= 1"
+                  message: The PostgreSQL cluster has at least one ready instance.
+        {{ end }}
+        - textAnalyze:
+            checkName: Database Connection Errors
+            fileName: bootcamp/*/*.log
+            regex: '"level":"ERROR".*"msg":"db"'
+            outcomes:
+              - fail:
+                  when: "true"
+                  message: >-
+                    The application logged a database connection error on startup. This usually
+                    means the PostgreSQL cluster is unavailable or the connection credentials are
+                    incorrect. Check the postgres pod logs and CNPG cluster events for details.
+              - pass:
+                  when: "false"
+                  message: No database connection errors found in application logs.
+        - nodeResources:
+            checkName: Node Readiness
+            outcomes:
+              - fail:
+                  when: "nodeCondition(Ready) == False"
+                  message: >-
+                    One or more nodes are not Ready. Pods may not be schedulable.
+                    Run 'kubectl describe node <node-name>' to investigate.
+              - fail:
+                  when: "nodeCondition(Ready) == Unknown"
+                  message: >-
+                    One or more nodes have an unknown readiness state. The node may have lost
+                    contact with the control plane. Run 'kubectl describe node <node-name>' to investigate.
+              - pass:
+                  message: All nodes are Ready.
+        - storageClass:
+            checkName: Default Storage Class
+            outcomes:
+              - fail:
+                  message: >-
+                    No default storage class is available. The application requires a default
+                    storage class to provision persistent volumes for the database and file storage.
+                    Configure a default storage class before installing.
+              - pass:
+                  message: A default storage class is available.
         - clusterPodStatuses:
             namespaces:
               - {{ .Release.Namespace }}

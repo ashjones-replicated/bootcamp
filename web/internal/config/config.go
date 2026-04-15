@@ -18,6 +18,7 @@ type Config struct {
 	CookieSecure     bool
 	SessionDuration  time.Duration
 	ReplicatedSDKURL string
+	PodNamespace     string
 }
 
 func Load() (*Config, error) {
@@ -29,7 +30,8 @@ func Load() (*Config, error) {
 		AdminPassword:    os.Getenv("ADMIN_PASSWORD"),
 		CookieSecure:     getenvBool("COOKIE_SECURE", true),
 		SessionDuration:  24 * time.Hour,
-		ReplicatedSDKURL: getenv("REPLICATED_SDK_URL", "http://replicated:3000"),
+		ReplicatedSDKURL: os.Getenv("REPLICATED_SDK_URL"),
+		PodNamespace:     getenv("POD_NAMESPACE", "default"),
 	}
 	if c.DatabaseURL == "" {
 		return nil, fmt.Errorf("DATABASE_URL is required")

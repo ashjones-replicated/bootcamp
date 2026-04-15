@@ -106,6 +106,7 @@ func (a *App) handleEntitlements(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]any{
 		"allow_user_creation": allowUserCreation,
+		"sdk_available":       a.License != nil,
 	})
 }
 

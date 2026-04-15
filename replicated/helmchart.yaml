@@ -8,6 +8,10 @@ spec:
     chartVersion: 0.1.0
   weight: 2
   values:
+    global:
+      replicated:
+        proxy:
+          registryDomain: "registry.9265.gay"
     secrets:
       uploadAdminToken: repl{{ ConfigOption "upload_admin_token" }}
       adminPassword: repl{{ ConfigOption "admin_password" }}
@@ -20,6 +24,7 @@ spec:
         size: repl{{ ConfigOption "upload_storage_size" }}
     config:
       cookieSecure: '{{repl if ConfigOptionEquals "ingress_type" "traefik_https" }}true{{repl else }}false{{repl end }}'
+      replicatedSDKURL: "http://replicated:3000"
     gateway:
       host: repl{{ ConfigOption "hostname" }}
       tls: repl{{ ConfigOptionEquals "ingress_type" "traefik_https" }}
@@ -50,6 +55,12 @@ spec:
         upload:
           maxUploadBytes: repl{{ ConfigOption "upload_max_bytes" }}
   builder:
+    # Builder renders the chart to collect images for the airgap bundle.
+    # Override the proxy domain so images resolve to their original registries.
+    global:
+      replicated:
+        proxy:
+          registryDomain: ""
     image:
       repository: ghcr.io/ashjones-replicated/bootcamp
       tag: "sha-1462544"

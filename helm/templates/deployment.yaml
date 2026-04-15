@@ -16,10 +16,15 @@ spec:
       annotations:
         checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
     spec:
+      serviceAccountName: {{ include "bootcamp.fullname" . }}
+      {{- if .Values.global.replicated.dockerconfigjson }}
+      imagePullSecrets:
+        - name: enterprise-pull-secret
+      {{- end }}
       {{- if .Values.postgres.internal }}
       initContainers:
         - name: wait-for-postgres
-          image: busybox
+          image: {{ include "bootcamp.proxyImage" (dict "root" . "image" "docker.io/library/busybox:latest") }}
           command:
             - sh
             - -c
@@ -31,7 +36,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: {{ include "bootcamp.proxyImage" (dict "root" . "image" (printf "%s:%s" .Values.image.repository (.Values.image.tag | default .Chart.AppVersion))) }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
@@ -77,11 +82,17 @@ spec:
                   name: {{ include "bootcamp.fullname" . }}
                   key: ADMIN_PASSWORD
             {{- end }}
+            {{- if .Values.config.replicatedSDKURL }}
             - name: REPLICATED_SDK_URL
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "bootcamp.fullname" . }}
                   key: REPLICATED_SDK_URL
+            {{- end }}
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:

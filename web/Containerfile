@@ -1,9 +1,15 @@
 from --platform=$BUILDPLATFORM golang:alpine as builder
 ARG TARGETOS TARGETARCH
+ARG SUPPORT_BUNDLE_VERSION=v0.126.1
 workdir /opt
 copy . .
 run GOOS=$TARGETOS GOARCH=$TARGETARCH CGO_ENABLED=0 go build -o webapp ./cmd/server
+run ARCH=${TARGETARCH:-$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')} && \
+    wget -qO- "https://github.com/replicatedhq/troubleshoot/releases/download/${SUPPORT_BUNDLE_VERSION}/support-bundle_linux_${ARCH}.tar.gz" \
+    | tar xz support-bundle
 
 from scratch
+copy --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 copy --from=builder /opt/webapp /webapp
+copy --from=builder /opt/support-bundle /support-bundle
 entrypoint ["/webapp"]

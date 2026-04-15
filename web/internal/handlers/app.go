@@ -72,6 +72,7 @@ func (a *App) RegisterRoutes(mux *http.ServeMux) http.Handler {
 	mux.Handle("POST /api/admin/users", admin(http.HandlerFunc(a.handleCreateUser)))
 	mux.Handle("DELETE /api/admin/users/{id}", admin(http.HandlerFunc(a.handleDeleteUser)))
 	mux.Handle("GET /api/admin/entitlements", admin(http.HandlerFunc(a.handleEntitlements)))
+	mux.Handle("POST /api/admin/supportbundle", admin(http.HandlerFunc(a.handleGenerateSupportBundle)))
 
 	return a.checkLicenseExpiry(mux)
 }
