@@ -65,10 +65,40 @@ spec:
             Size of the PersistentVolumeClaim for uploaded files
             (e.g. 10Gi, 100Gi).
           required: true
+          when: 'repl{{ ConfigOptionEquals "upload_type" "internal" }}'
 
     - name: upload_settings
       title: Upload Settings
       items:
+        - name: upload_type
+          type: radio
+          title: Upload Service
+          required: true
+          default: internal
+          items:
+            - name: internal
+              title: "Embedded"
+            - name: external
+              title: "External"
+
+        - name: upload_service_url
+          type: text
+          title: Upload Service URL
+          help_text: >-
+            Base URL of the external upload service
+            (e.g. https://upload.example.com).
+          required: true
+          when: 'repl{{ ConfigOptionEquals "upload_type" "external" }}'
+
+        - name: external_upload_admin_token
+          type: password
+          title: Upload Service Admin Token
+          help_text: >-
+            Admin token for the external upload service. This must match the
+            token configured on the external service.
+          required: true
+          when: 'repl{{ ConfigOptionEquals "upload_type" "external" }}'
+
         - name: upload_ttl
           type: text
           title: File TTL

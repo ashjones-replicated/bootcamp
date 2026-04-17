@@ -44,6 +44,8 @@ postgres:
 
 # Upload service
 upload:
+  # Set to false to use an external upload service; provide config.uploadServiceURL.
+  internal: true
   image:
     repository: codeberg.org/sparrow/upload
     tag: "v2.0.0"

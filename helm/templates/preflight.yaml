@@ -1,0 +1,116 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "bootcamp.fullname" . }}-preflight
+  labels:
+    {{- include "bootcamp.labels" . | nindent 4 }}
+    troubleshoot.sh/kind: preflight
+stringData:
+  preflight.yaml: |
+    apiVersion: troubleshoot.sh/v1beta2
+    kind: Preflight
+    metadata:
+      name: {{ include "bootcamp.fullname" . }}
+    spec:
+      collectors:
+        - clusterInfo: {}
+        - clusterResources: {}
+        {{ if not .Values.postgres.internal }}
+        - postgres:
+            collectorName: external-database
+            uri: {{ .Values.secrets.databaseURL | quote }}
+        {{ end }}
+        {{ if not .Values.upload.internal }}
+        - http:
+            collectorName: upload-service
+            get:
+              url: {{ .Values.config.uploadServiceURL }}
+        {{ end }}
+      analyzers:
+        {{ if not .Values.postgres.internal }}
+        - postgres:
+            checkName: External Database Connectivity
+            collectorName: external-database
+            outcomes:
+              - fail:
+                  when: "connected == false"
+                  message: >-
+                    Cannot connect to the external PostgreSQL database. Verify that the
+                    database host is reachable from the cluster and that the credentials
+                    in DATABASE_URL are correct. Check firewall rules and network policies
+                    between the cluster and the database server.
+              - pass:
+                  message: Successfully connected to the external PostgreSQL database.
+        {{ end }}
+        {{ if not .Values.upload.internal }}
+        - textAnalyze:
+            checkName: Upload Service Connectivity
+            fileName: http/upload-service/result.json
+            regex: '"status":[1-9][0-9]*'
+            outcomes:
+              - pass:
+                  when: "true"
+                  message: The external upload service is reachable.
+              - fail:
+                  when: "false"
+                  message: >-
+                    Cannot reach the upload service at {{ .Values.config.uploadServiceURL }}.
+                    The application requires the upload service to store and retrieve files.
+                    Verify the URL is correct and the service is accessible from the cluster.
+        {{ end }}
+        - nodeResources:
+            checkName: Cluster CPU
+            outcomes:
+              - fail:
+                  when: "sum(cpuCapacity) < 2"
+                  message: >-
+                    The cluster has fewer than 2 CPU cores available. Bootcamp requires at
+                    least 2 cores to run reliably. Add nodes or increase node CPU capacity
+                    before installing.
+              - pass:
+                  message: Cluster has sufficient CPU capacity (2+ cores).
+        - nodeResources:
+            checkName: Cluster Memory
+            outcomes:
+              - fail:
+                  when: "sum(memoryCapacity) < 2Gi"
+                  message: >-
+                    The cluster has fewer than 2 GiB of memory available. Bootcamp requires
+                    at least 2 GiB to run the application and database. Add nodes or increase
+                    node memory before installing.
+              - pass:
+                  message: Cluster has sufficient memory (2+ GiB).
+        - clusterVersion:
+            outcomes:
+              - fail:
+                  when: "< 1.26.0"
+                  message: >-
+                    Kubernetes 1.26.0 or later is required. Your cluster is running an
+                    unsupported version. Upgrade before installing.
+                  uri: https://kubernetes.io/releases/
+              - warn:
+                  when: "< 1.29.0"
+                  message: >-
+                    Kubernetes 1.29.0 or later is recommended. Your cluster meets the
+                    minimum requirement but upgrading is advised.
+                  uri: https://kubernetes.io/releases/
+              - pass:
+                  message: Kubernetes version meets the minimum requirement (1.26.0+).
+        - distribution:
+            outcomes:
+              - fail:
+                  when: "== docker-desktop"
+                  message: >-
+                    Docker Desktop is not a supported deployment target. Use a
+                    production-grade Kubernetes distribution such as EKS, GKE, AKS, or k0s.
+                    See https://docs.replicated.com/vendor/testing-supported-clusters for
+                    supported options.
+              - fail:
+                  when: "== microk8s"
+                  message: >-
+                    MicroK8s is not a supported deployment target. Use a
+                    production-grade Kubernetes distribution such as EKS, GKE, AKS, or k0s.
+                    See https://docs.replicated.com/vendor/testing-supported-clusters for
+                    supported options.
+              - pass:
+                  message: Kubernetes distribution is supported.

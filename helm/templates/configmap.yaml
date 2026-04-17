@@ -6,7 +6,11 @@ metadata:
     {{- include "bootcamp.labels" . | nindent 4 }}
 data:
   BIND_ADDRESS: {{ .Values.config.bindAddress | quote }}
+  {{- if .Values.upload.internal }}
   UPLOAD_SERVICE_URL: {{ .Values.config.uploadServiceURL | default (printf "http://%s:8080" (include "bootcamp.uploadName" .)) | quote }}
+  {{- else }}
+  UPLOAD_SERVICE_URL: {{ .Values.config.uploadServiceURL | required "config.uploadServiceURL is required when upload.internal is false" | quote }}
+  {{- end }}
   COOKIE_SECURE: {{ .Values.config.cookieSecure | quote }}
   {{- if .Values.config.replicatedSDKURL }}
   REPLICATED_SDK_URL: {{ .Values.config.replicatedSDKURL | quote }}

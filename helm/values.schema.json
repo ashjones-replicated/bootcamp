@@ -137,6 +137,10 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "internal": {
+          "type": "boolean",
+          "description": "Deploy the bundled upload service. Set to false to use an external upload service; config.uploadServiceURL must be provided."
+        },
         "image": {
           "type": "object",
           "additionalProperties": false,

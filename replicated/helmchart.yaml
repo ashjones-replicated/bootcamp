@@ -13,10 +13,12 @@ spec:
         proxy:
           registryDomain: "registry.9265.gay"
     secrets:
-      uploadAdminToken: repl{{ ConfigOption "upload_admin_token" }}
+      uploadAdminToken: repl{{ if ConfigOptionEquals "upload_type" "internal" }}{{ ConfigOption "upload_admin_token" }}{{ else }}{{ ConfigOption "external_upload_admin_token" }}{{ end }}
       adminPassword: repl{{ ConfigOption "admin_password" }}
     postgres:
       internal: repl{{ ConfigOptionEquals "postgres_type" "internal" }}
+    upload:
+      internal: repl{{ ConfigOptionEquals "upload_type" "internal" }}
       storage:
         size: repl{{ ConfigOption "postgres_storage_size" }}
     upload:
@@ -44,6 +46,11 @@ spec:
       values:
         secrets:
           databaseURL: repl{{ ConfigOption "external_database_url" }}
+    - when: 'repl{{ ConfigOptionEquals "upload_type" "external" }}'
+      recursiveMerge: true
+      values:
+        config:
+          uploadServiceURL: repl{{ ConfigOption "upload_service_url" }}
     - when: 'repl{{ ConfigOptionNotEquals "upload_ttl" "" }}'
       recursiveMerge: true
       values:

@@ -21,6 +21,7 @@ stringData:
             name: bootcamp
             limits:
               maxAge: 168h
+        {{ if .Values.upload.internal }}
         - logs:
             selector:
               - app.kubernetes.io/name={{ include "bootcamp.name" . }}-upload
@@ -29,6 +30,7 @@ stringData:
             name: upload
             limits:
               maxAge: 168h
+        {{ end }}
         {{ if .Values.postgres.internal }}
         - logs:
             selector:
@@ -69,6 +71,7 @@ stringData:
               - pass:
                   when: ">= 1"
                   message: The bootcamp deployment is running.
+        {{ if .Values.upload.internal }}
         - deploymentStatus:
             name: {{ include "bootcamp.uploadName" . }}
             namespace: {{ .Release.Namespace }}
@@ -81,6 +84,7 @@ stringData:
               - pass:
                   when: ">= 1"
                   message: The upload service deployment is running.
+        {{ end }}
         {{ if .Values.postgres.internal }}
         - statefulsetStatus:
             name: {{ include "bootcamp.pgClusterName" . }}
