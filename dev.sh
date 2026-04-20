@@ -13,7 +13,7 @@ podman run -d --network bootcamp --name bootcamp-pg \
     -e POSTGRES_USER=bootcamp \
     -e POSTGRES_PASSWORD=bootcamp \
     -e POSTGRES_DB=bootcamp \
-    index.docker.io/library/postgres:16-alpine
+    docker.io/library/postgres:16-alpine
 
 podman run -d --network bootcamp --name bootcamp-upload \
     -e UPLOAD_BINDADDRESS=:8080 \

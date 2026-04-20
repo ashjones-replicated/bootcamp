@@ -24,7 +24,7 @@ spec:
       {{- if .Values.postgres.internal }}
       initContainers:
         - name: wait-for-postgres
-          image: {{ include "bootcamp.proxyImage" (dict "root" . "image" "index.docker.io/library/busybox:latest") }}
+          image: {{ include "bootcamp.proxyImage" (dict "root" . "image" "docker.io/library/busybox:latest") }}
           command:
             - sh
             - -c
