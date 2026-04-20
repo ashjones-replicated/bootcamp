@@ -23,7 +23,7 @@ spec:
       {{- end }}
       containers:
         - name: upload
-          image: {{ include "bootcamp.proxyImage" (dict "root" . "image" (printf "%s:%s" .Values.upload.image.repository .Values.upload.image.tag)) }}
+          image: {{ printf "%s:%s" .Values.upload.image.repository .Values.upload.image.tag }}
           imagePullPolicy: {{ .Values.upload.image.pullPolicy }}
           ports:
             - name: http
