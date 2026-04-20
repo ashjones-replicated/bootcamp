@@ -24,7 +24,7 @@ spec:
       storage:
         size: repl{{ ConfigOption "upload_storage_size" }}
     config:
-      cookieSecure: '{{repl if ConfigOptionEquals "ingress_type" "traefik_https" }}true{{repl else }}false{{repl end }}'
+      cookieSecure: repl{{ ConfigOptionEquals "ingress_type" "traefik_https" }}
       allowPrivateUploads: repl{{ ConfigOptionEquals "allow_private_uploads" "1" }}
       allowSingleUseLinks: repl{{ ConfigOptionEquals "allow_single_use_links" "1" }}
       replicatedSDKURL: "http://bootcamp-sdk:3000"

@@ -68,18 +68,15 @@
           "description": "Base URL of the upload service. Defaults to the internal service URL when empty."
         },
         "cookieSecure": {
-          "type": "string",
-          "enum": ["true", "false"],
+          "type": "boolean",
           "description": "Set to false only when running without TLS (e.g. local development)."
         },
         "allowPrivateUploads": {
-          "type": "string",
-          "enum": ["true", "false"],
+          "type": "boolean",
           "description": "When false, the private upload option is hidden from the upload form."
         },
         "allowSingleUseLinks": {
-          "type": "string",
-          "enum": ["true", "false"],
+          "type": "boolean",
           "description": "When false, the single-use link option is hidden from the upload form."
         },
         "replicatedSDKURL": {

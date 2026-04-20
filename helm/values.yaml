@@ -17,10 +17,10 @@ config:
   # Defaults to the internal upload service URL derived from the release name.
   # Override only if pointing at an external upload service.
   uploadServiceURL: ""
-  cookieSecure: "true"
-  # Feature toggles — set to "false" to hide the option from the upload form.
-  allowPrivateUploads: "true"
-  allowSingleUseLinks: "true"
+  cookieSecure: true
+  # Feature toggles — set to false to hide the option from the upload form.
+  allowPrivateUploads: true
+  allowSingleUseLinks: true
   # Override only if the Replicated SDK is not running at the default service address.
   replicatedSDKURL: ""
 
