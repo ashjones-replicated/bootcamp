@@ -17,14 +17,14 @@ echo "Packaging bootcamp Helm chart (appVersion: $IMAGE_TAG)..."
 helm package "$REPO_ROOT/helm" --app-version "$IMAGE_TAG" --destination "$SCRIPT_DIR"
 
 
-cnpg_version=$(yq -r .spec.chart.chartVersion cnpg-helmchart.yaml)
+cnpg_version=$(yq -r .spec.chart.chartVersion "$SCRIPT_DIR/cnpg-helmchart.yaml")
 echo "Downloading cloudnative-pg chart..."
 helm pull cloudnative-pg \
   --repo https://cloudnative-pg.github.io/charts \
   --version $cnpg_version \
   --destination "$SCRIPT_DIR"
 
-traefik_version=$(yq -r .spec.chart.chartVersion traefik-helmchart.yaml)
+traefik_version=$(yq -r .spec.chart.chartVersion "$SCRIPT_DIR/traefik-helmchart.yaml")
 echo "Downloading traefik chart..."
 helm pull traefik \
   --repo https://helm.traefik.io/traefik \
