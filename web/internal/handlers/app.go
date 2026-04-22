@@ -1,10 +1,12 @@
 package handlers
 
 import (
+	"context"
 	"io/fs"
 	"log/slog"
 	"net/http"
 	"strings"
+	"time"
 
 	"bootcamp/web/internal/config"
 	"bootcamp/web/internal/db"
@@ -12,9 +14,23 @@ import (
 	"bootcamp/web/internal/upload"
 )
 
+// Database defines the storage operations used by the HTTP handlers.
+// The concrete *db.DB type satisfies this interface.
+type Database interface {
+	Ping(ctx context.Context) error
+	GetSessionUser(ctx context.Context, sessionID string) (*db.User, error)
+	GetUserByUsername(ctx context.Context, username string) (*db.User, error)
+	CreateSession(ctx context.Context, userID int64, expiresAt time.Time) (string, error)
+	DeleteSession(ctx context.Context, sessionID string) error
+	UpdatePassword(ctx context.Context, userID int64, passwordHash string) error
+	ListUsers(ctx context.Context) ([]*db.User, error)
+	CreateUser(ctx context.Context, username, passwordHash, tokenName, token string, isAdmin bool) (*db.User, error)
+	DeleteUser(ctx context.Context, id int64) (string, error)
+}
+
 // App holds application dependencies and registers HTTP routes.
 type App struct {
-	DB      *db.DB
+	DB      Database
 	Upload  *upload.Client
 	Cfg     *config.Config
 	Files   fs.FS
